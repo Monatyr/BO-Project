@@ -1,14 +1,13 @@
 import copy
 import random
 from function import *
-from exaples import *
 import numpy as np
 
 
 def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
     population = []
     # case 1
-    if max_buildings==-1 and max_cost==-1:
+    if max_buildings == -1 and max_cost == -1:
         for _ in range(size):
             vector = list(np.random.choice([HOUSE, FUN, WORK], size=length))
             vector[0] = CENTRE
@@ -28,7 +27,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                     vertices_possible.add(u)
             vertices_done.add(0)
             # case 2
-            if max_cost==-1:
+            if max_cost == -1:
                 for _ in range(max_buildings):
                     vertex = random.choice(list(vertices_possible - vertices_done))
                     vector[vertex] = random.choice([HOUSE, FUN, WORK])
@@ -38,12 +37,12 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                             vertices_possible.add(u)
                     vertices_done.add(vertex)
             # case 3
-            elif max_buildings==-1:
+            elif max_buildings == -1:
                 cost = 0
                 while True:
                     vertex = random.choice(list(vertices_possible - vertices_done))
                     choice = random.choice([HOUSE, FUN, WORK])
-                    if cost+COSTS[choice] > max_cost:
+                    if cost + COSTS[choice] > max_cost:
                         break
                     cost += COSTS[choice]
                     vector[vertex] = choice
@@ -59,7 +58,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                 while True:
                     vertex = random.choice(list(vertices_possible - vertices_done))
                     choice = random.choice([HOUSE, FUN, WORK])
-                    if cost+COSTS[choice]>max_cost or buildings+1>max_buildings:
+                    if cost + COSTS[choice] > max_cost or buildings + 1 > max_buildings:
                         break
                     cost += COSTS[choice]
                     buildings += 1
@@ -71,6 +70,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                     vertices_done.add(vertex)
             population.append(vector)
     return population
+
 
 """
 def mutate(vector):
