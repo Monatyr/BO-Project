@@ -1,12 +1,11 @@
-import copy
-import random
-from function import *
+from utils import *
 import numpy as np
+import random
 
 
 def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
     population = []
-    # case 1
+    # case 1 - no limits
     if max_buildings == -1 and max_cost == -1:
         for _ in range(size):
             vector = list(np.random.choice([HOUSE, FUN, WORK], size=length))
@@ -26,7 +25,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                     vertices_possible.add(v)
                     vertices_possible.add(u)
             vertices_done.add(0)
-            # case 2
+            # case 2 - no max cost
             if max_cost == -1:
                 for _ in range(max_buildings):
                     vertex = random.choice(list(vertices_possible - vertices_done))
@@ -36,7 +35,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                             vertices_possible.add(v)
                             vertices_possible.add(u)
                     vertices_done.add(vertex)
-            # case 3
+            # case 3 - no max buildings
             elif max_buildings == -1:
                 cost = 0
                 while True:
@@ -51,7 +50,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                             vertices_possible.add(v)
                             vertices_possible.add(u)
                     vertices_done.add(vertex)
-            # case 4
+            # case 4 - all restraints active
             else:
                 cost = 0
                 buildings = 0
@@ -70,35 +69,6 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                     vertices_done.add(vertex)
             population.append(vector)
     return population
-
-
-"""
-def mutate(vector):
-    new = []
-    for num in vector:
-        if num == 0:
-            new.append(num)
-            continue
-        if random.randint(0, 9) == 0:
-            new.append(random.randint(1, 3))
-        else:
-            new.append(num)
-    return new
-
-
-def evolve(graph, length, epoch=10, size=100, children=100):
-    vectors = get_population(length, size)
-    population = []
-    for vector in vectors:
-        population.append((vector, f(*data(vector, graph))))
-    for _ in range(epoch):
-        new_population = copy.deepcopy(population)
-        for _ in range(children):
-            pop = random.choice(population)[0]
-            new_population.append((mutate(pop), f(*data(pop, graph))))
-        new_population.sort(key=lambda x: x[1], reverse=True)
-        population = new_population[:size]
-    return population[0]
 
 
 def get_graph(file):
@@ -126,8 +96,8 @@ def get_graph(file):
     if len(vertices_possible) != length:
         raise Exception("The graph is not connected")
 
-    return (graph, length)
+    return graph, length
 
-
-print(evolve(*get_graph("graph/f30")))
-"""
+if __name__ == '__main__':
+    G, number_of_vertices = get_graph('graph.txt')
+    print(get_population(number_of_vertices, 5, max_buildings=3, max_cost=60000, graph=G))
