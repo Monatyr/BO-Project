@@ -1,14 +1,5 @@
-NOTHING = -1
-CENTRE = 0
-HOUSE = 1
-FUN = 2
-WORK = 3
+from consts import *
 
-HAPPINESS_TIME = 0.1  # [0, 0.2]
-
-HOUSE_COST = 25600
-FUN_COST = 12800
-WORK_COST = 19200
 COSTS = [0, HOUSE_COST, FUN_COST, WORK_COST]
 
 value = {}
