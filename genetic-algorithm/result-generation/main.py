@@ -2,7 +2,7 @@ import copy
 
 from function import *
 from population import *
-from load_graph import *
+from load import *
 
 
 def cross(population, children=100, graph=None):

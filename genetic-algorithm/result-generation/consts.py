@@ -10,6 +10,8 @@ HOUSE_COST = 25600
 FUN_COST = 12800
 WORK_COST = 19200
 
+COSTS = [0, HOUSE_COST, FUN_COST, WORK_COST]
+
 city_kos = [(1, 2),
              (2, 3),
              (3, 4),

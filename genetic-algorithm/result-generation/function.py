@@ -1,7 +1,5 @@
 from consts import *
 
-COSTS = [0, HOUSE_COST, FUN_COST, WORK_COST]
-
 value = {}
 
 value[(NOTHING, NOTHING)] = (0, 0)
