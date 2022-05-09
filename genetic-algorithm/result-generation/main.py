@@ -1,41 +1,95 @@
 import copy
+import random
 
 from function import *
 from population import *
 from load import *
 
 
-def cross(population, children=100, graph=None):
+def cross(population, children=100, graph=None, max_buildings=None, max_cost=None):
     for _ in range(children):
-        pop = random.choice(population)
-        population.append(copy.deepcopy(pop))
+        parent1 = random.choice(population)
+        parent2 = random.choice(population)
+        child = [NOTHING for _ in range(len(parent1))]
+        child[0] = CENTRE
+        vertices_merged = set()
+        vertices_merged.add(0)
+        for i in range(len(parent1)):
+            if parent1[i] in [HOUSE, FUN, WORK]:
+                vertices_merged.add(i)
+        for i in range(len(parent2)):
+            if parent2[i] in [HOUSE, FUN, WORK]:
+                vertices_merged.add(i)
+        vertices_possible = set()
+        vertices_done = set()
+        vertices_possible.add(0)
+        n = -1
+        c = 0
+        while vertices_merged - vertices_done:
+            vertex = random.choice(list((vertices_merged & vertices_possible) - vertices_done))
+            building = NOTHING
+            while building == NOTHING:
+                building = random.choice([parent1[vertex], parent2[vertex]])
+            if max_cost is not None and c+COSTS[building] > max_cost:
+                break
+            c += COSTS[building]
+            n += 1
+            child[vertex] = building
+            for (u, v) in graph:
+                if vertex in (u, v):
+                    vertices_possible.add(v)
+                    vertices_possible.add(u)
+            vertices_done.add(vertex)
+            if max_buildings is not None and n == max_buildings:
+                break
+        while vertices_possible - vertices_done:
+            if max_buildings is not None and n == max_buildings:
+                break
+            vertex = random.choice(list(vertices_possible - vertices_done))
+            building = random.choice([HOUSE, FUN, WORK])
+            if max_cost is not None and c+COSTS[building] > max_cost:
+                break
+            c += COSTS[building]
+            n += 1
+            child[vertex] = building
+        population.append(copy.deepcopy(child))
 
 
-def mutate(population, chance=0.1):
-    for i in range(len(population)):
+def mutate(population, chance=0.1, max_cost=None):
+    for i in range(1, len(population)):
+        c = cost(population[i])
         for j in range(len(population[i])):
-            if population[i][j] in [1, 2, 3]:
+            if population[i][j] in [HOUSE, FUN, WORK]:
                 if random.uniform(0.0, 1.0) <= chance:
-                    population[i][j] = random.randint(1, 3)
+                    now = population[i][j]
+                    building = random.choice([HOUSE, FUN, WORK])
+                    if max_cost is not None and c+COSTS[building]-COSTS[now] <= max_cost:
+                        population[i][j] = building
+                        c += COSTS[building]-COSTS[now]
+                    else:
+                        population[i][j] = building
 
 
 def select(population, graph, size=100):
     population.sort(key=lambda vector: f(*data(vector, graph)), reverse=True)
-    for _ in range(size):
+    while len(population) != size:
         population.pop()
 
 
-def evolve(graph, length, epoch=10, size=100, children=100):
-    population = get_population(length, size)
-    for _ in range(epoch):
-        cross(population, children=children)
-        mutate(population, chance=0.9)
+def evolve(graph, length, epoch=100, size=100, children=100, max_buildings=None, max_cost=None):
+    population = get_population(length, size, graph=graph, max_buildings=max_buildings, max_cost=max_cost)
+    print("{:.2f}%".format(0), data(population[0], graph), "==", f(*data(population[0], graph)), "with", str(cost(population[0]))+"$", buildings(population[0]))
+    for percent in range(epoch):
+        cross(population, children=children, graph=graph, max_buildings=max_buildings, max_cost=max_cost)
+        mutate(population, max_cost=max_cost)
         select(population, graph, size=size)
+        print("{:.2f}%".format(100*(percent+1)/epoch), data(population[0], graph), "==", f(*data(population[0], graph)), str(cost(population[0]))+"$", buildings(population[0]))
     return population[0], f(*data(population[0], graph))
 
 
-#print(evolve(*get_graph("../../graph/e5"), 1, 2, 2))
-print(evolve(city_kos, 12))
+print(evolve(*get_graph("../../graph/f30"), 10, 10, 10))
+#print(evolve(city_kos, 12))
+
 
 """
     for vector in vectors:

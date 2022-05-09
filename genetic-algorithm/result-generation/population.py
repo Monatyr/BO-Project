@@ -3,10 +3,10 @@ import random
 from consts import *
 
 
-def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
+def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
     population = []
     # case 1
-    if max_buildings == -1 and max_cost == -1:
+    if max_buildings is None and max_cost is None:
         for _ in range(size):
             vector = list(np.random.choice([HOUSE, FUN, WORK], size=length))
             vector[0] = CENTRE
@@ -26,7 +26,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                     vertices_possible.add(u)
             vertices_done.add(0)
             # case 2
-            if max_cost == -1:
+            if max_cost is None:
                 for _ in range(max_buildings):
                     vertex = random.choice(list(vertices_possible - vertices_done))
                     vector[vertex] = random.choice([HOUSE, FUN, WORK])
@@ -36,7 +36,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
                             vertices_possible.add(u)
                     vertices_done.add(vertex)
             # case 3
-            elif max_buildings == -1:
+            elif max_buildings is None:
                 cost = 0
                 while True:
                     vertex = random.choice(list(vertices_possible - vertices_done))

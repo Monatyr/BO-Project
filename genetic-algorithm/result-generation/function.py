@@ -36,24 +36,17 @@ value[(WORK, WORK)] = (0, 0)
 def data(solution, city):
     money = 0
     happiness = 0
-    cost = 0
-    buildings = 0
     for building in solution:
         if building == NOTHING:
             pass
         elif building == CENTRE:
             pass
         elif building == HOUSE:
-            cost += HOUSE_COST
-            buildings += 1
+            pass
         elif building == FUN:
             happiness += 1
-            cost += FUN_COST
-            buildings += 1
         elif building == WORK:
             happiness -= 1
-            cost += WORK_COST
-            buildings += 1
         else:
             print("Wrong building!")
 
@@ -62,15 +55,55 @@ def data(solution, city):
         money += m
         happiness += h
 
+    """if happiness < -5:
+        happiness = -5
+    elif happiness > 5:
+        happiness = 5
+"""
+    return (money, happiness)
+
+
+def cost(solution):
+    c = 0
+    for building in solution:
+        if building == NOTHING:
+            pass
+        elif building == CENTRE:
+            pass
+        elif building == HOUSE:
+            c += HOUSE_COST
+        elif building == FUN:
+            c += FUN_COST
+        elif building == WORK:
+            c += WORK_COST
+        else:
+            print("Wrong building!")
+    return c
+
+
+def buildings(solution):
+    n = 0
+    for building in solution:
+        if building == NOTHING:
+            pass
+        elif building == CENTRE:
+            pass
+        elif building == HOUSE:
+            n += 1
+        elif building == FUN:
+            n += 1
+        elif building == WORK:
+            n += 1
+        else:
+            print("Wrong building!")
+    return n
+
+
+def f(money, happiness):
     if happiness < -5:
         happiness = -5
     elif happiness > 5:
         happiness = 5
-
-    return (money, happiness, buildings, cost)
-
-
-def f(money, happiness, buildings, cost):
     if happiness < 0:
         real_money = (1 + HAPPINESS_TIME * happiness) * money - HAPPINESS_TIME * happiness * money / 2
     elif happiness > 0:
