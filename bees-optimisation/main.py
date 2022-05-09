@@ -197,9 +197,9 @@ def generate_solution(old_solution, G, num_of_changes=5):
 
 def update_top(top, solution):
     top.append(solution)
+    top.sort(key=lambda el: el.profitability, reverse=True)
     if len(top) >= TOP_SOLUTIONS_NUM:
         top.pop(-1)
-    top.sort(key=lambda el: el.profitability, reverse=True)
 
 
 def first_bees(graph, num_of_vertices, iterations=40, elite_places=3, good_places=2, elite_bees=50,
