@@ -1,6 +1,98 @@
-from utils import *
-import numpy as np
 import random
+import numpy as np
+from queue import Queue
+
+NOTHING = -1
+CENTRE = 0
+HOUSE = 1
+FUN = 2
+WORK = 3
+
+HAPPINESS_TIME = 0.1  # [0, 0.2]
+
+HOUSE_COST = 25600
+FUN_COST = 12800
+WORK_COST = 19200
+COSTS = [0, HOUSE_COST, FUN_COST, WORK_COST]
+
+value = {}
+
+value[(NOTHING, NOTHING)] = (0, 0)
+value[(NOTHING, CENTRE)] = (0, 0)
+value[(NOTHING, HOUSE)] = (0, 0)
+value[(NOTHING, FUN)] = (0, 0)
+value[(NOTHING, WORK)] = (0, 0)
+
+value[(CENTRE, NOTHING)] = (0, 0)
+value[(CENTRE, CENTRE)] = (0, 0)
+value[(CENTRE, HOUSE)] = (0, 0)
+value[(CENTRE, FUN)] = (0, 1)
+value[(CENTRE, WORK)] = (1, 0)
+
+value[(HOUSE, NOTHING)] = (0, 0)
+value[(HOUSE, CENTRE)] = (0, 0)
+value[(HOUSE, HOUSE)] = (0, 0)
+value[(HOUSE, FUN)] = (0, 1)
+value[(HOUSE, WORK)] = (1, 0)
+
+value[(FUN, NOTHING)] = (0, 0)
+value[(FUN, CENTRE)] = (0, 1)
+value[(FUN, HOUSE)] = (0, 1)
+value[(FUN, FUN)] = (0, 0)
+value[(FUN, WORK)] = (0, -1)
+
+value[(WORK, NOTHING)] = (0, 0)
+value[(WORK, CENTRE)] = (1, 0)
+value[(WORK, HOUSE)] = (1, 0)
+value[(WORK, FUN)] = (0, -1)
+value[(WORK, WORK)] = (0, 0)
+
+
+def data(solution, city):
+    money = 0
+    happiness = 0
+    cost = 0
+    buildings = 0
+    for building in solution:
+        if building == NOTHING:
+            pass
+        elif building == CENTRE:
+            pass
+        elif building == HOUSE:
+            cost += HOUSE_COST
+            buildings += 1
+        elif building == FUN:
+            happiness += 1
+            cost += FUN_COST
+            buildings += 1
+        elif building == WORK:
+            happiness -= 1
+            cost += WORK_COST
+            buildings += 1
+        else:
+            print("Wrong building!")
+
+    for (x, y) in city:
+        (m, h) = value[(solution[x], solution[y])]
+        money += m
+        happiness += h
+
+    if happiness < -5:
+        happiness = -5
+    elif happiness > 5:
+        happiness = 5
+
+    return (money, happiness, buildings, cost)
+
+
+def f(money, happiness, buildings, cost):
+    if happiness < 0:
+        real_money = (1 + HAPPINESS_TIME * happiness) * money - HAPPINESS_TIME * happiness * money / 2
+    elif happiness > 0:
+        real_money = (1 - HAPPINESS_TIME * happiness) * money + HAPPINESS_TIME * happiness * money * 2
+    else:
+        real_money = money
+    return real_money
 
 
 def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
@@ -71,7 +163,7 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
     return population
 
 
-def get_graph(file):
+def get_graph_edges(file):
     f = open(file, "r")
     lines = f.readlines()
     graph = []
@@ -98,6 +190,54 @@ def get_graph(file):
 
     return graph, length
 
-if __name__ == '__main__':
-    G, number_of_vertices = get_graph('graph.txt')
-    print(get_population(number_of_vertices, 5, max_buildings=3, max_cost=60000, graph=G))
+
+class Node():
+    def __init__(self, i):
+        self.neighbours = list()
+        self.visited = False
+        self.index = i
+
+
+def get_graph(filename: str):
+    graph = []
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        graph = [Node(i) for i in range(int(lines[0].split()[2]))]
+        for line in lines[1:]:
+            u, v = line.split()[1:]
+            u, v = int(u), int(v)
+            graph[u-1].neighbours.append(graph[v-1])
+            graph[v-1].neighbours.append(graph[u-1])
+    return graph
+
+
+def check_connectivity(graph):
+    q = Queue()
+    q.put(graph[0])
+    visited = 0
+
+    for node in graph:
+        node.visited = False
+
+    while not q.empty():
+        u = q.get()
+        u.visited = True
+        visited += 1
+
+        for n in u.neighbours:
+            if not n.visited:
+                q.put(n)
+                n.visited = True
+
+    return visited == len(graph)
+
+
+
+if __name__ == "__main__":
+    G = get_graph('graphs/graph.txt')
+    print(check_connectivity(G))
+    # pop_graph = get_graph_edges('graphs/graph.txt')[0]
+    # get_population(5, 1, max_buildings=5, graph=pop_graph, max_cost=100000000)
+
+    G, number_of_vertices = get_graph_edges('graphs/graph.txt')
+    print(get_population(number_of_vertices, 5, max_buildings=number_of_vertices, max_cost=60000, graph=G))
