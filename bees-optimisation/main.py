@@ -260,7 +260,7 @@ def bees_optimization_algorithm(graph, num_of_vertices, iterations=40, populatio
             local_solutions = [top_solution] if top_solution.counter < 10 else [] #jeśli rozwiązanie nie jest zbyt długo rozważane
 
             for _ in range(elite_bees if i < elite_places else good_bees): #generowanie nowych rozwiązań dla miejsc elitarnych i dobrych
-                new_solution = Solution(generate_solution(top_solution.solution, graph, 1), graph)
+                new_solution = Solution(generate_solution(top_solution.solution, graph, random.randint(1, int(0.2*top_solution.num_of_buildings))), graph)
                 local_solutions.append(new_solution)
 
             current_solutions.append(max(local_solutions, key=lambda x: x.profitability)) #zapamiętywanie najlepszego lokalnego rozwiązania
