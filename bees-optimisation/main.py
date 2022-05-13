@@ -1,5 +1,4 @@
 from bees_utils import *
-from sortedcontainers import SortedSet
 
 max_buildings = -1
 max_cost = -1
@@ -8,7 +7,7 @@ max_cost = -1
 ADD_THRESHOLD = 0.33
 DELETE_THRESHOLD = 0.66
 
-TOP_SOLUTIONS_NUM = 10
+BEST_SOLUTIONS_NUM = 5
 
 class Solution:
     def __init__(self, solution, city):
@@ -22,6 +21,14 @@ class Solution:
 
     def __lt__(self, other):
         return self.profitability < other.profitability
+
+    def __eq__(self, other):
+        if isinstance(other, Solution):
+            return self.solution == other.solution
+        return False
+
+    def __hash__(self):
+        return hash(self.cost + sum(self.solution) + self.happines)
 
 
 def initial_solutions(graph, num_of_solutions: int, solution_length: int, max_buildings_param=-1, max_cost_param=-1):
@@ -195,48 +202,82 @@ def generate_solution(old_solution, G, num_of_changes=5):
     return new_solution
 
 
-def update_top(top, solution):
-    top.append(solution)
-    top.sort(key=lambda el: el.profitability, reverse=True)
-    if len(top) >= TOP_SOLUTIONS_NUM:
-        top.pop(-1)
+# def update_top(top, solution):
+#     top.append(solution)
+#     top.sort(key=lambda el: el.profitability, reverse=True)
+#     if len(top) >= BEST_SOLUTIONS_NUM:
+#         top.pop(-1)
 
 
-def first_bees(graph, num_of_vertices, iterations=40, elite_places=3, good_places=2, elite_bees=50,
-               good_bees=25) -> Solution:
-    current_solutions = initial_solutions(graph, elite_places + good_places,
-                                          num_of_vertices)  # lista Solutions - czyli rozwiązanie i obliczona dla niego funkcja celu, posortowane malejąco
+# def first_bees(graph, num_of_vertices, iterations=40, population_size=10, elite_places=3, good_places=2, elite_bees=50, good_bees=25) -> list[Solution]:
+#     current_solutions = initial_solutions(graph, population_size, num_of_vertices)  # lista Solutions - czyli rozwiązanie i obliczona dla niego funkcja celu, posortowane malejąco
+#     counter = 0
+
+#     top_solutions = []
+
+#     while counter < iterations:
+#         chosen_solutions = current_solutions[:elite_places + good_places]  # rozwiązania elitarne + dobre
+#         new_solutions = []
+
+#         for i, chosen_solution in enumerate(chosen_solutions):
+#             local_solutions = []
+#             chosen_solution.counter += 1
+#             for _ in range(elite_bees if i < elite_places else good_bees):
+#                 new_solution = generate_solution(chosen_solution.solution, graph)
+#                 solution = Solution(new_solution, graph)
+#                 local_solutions.append(solution)
+#                 update_top(top_solutions, solution)
+#             local_solutions.sort(key=lambda el: el.profitability, reverse=True)
+#             new_solutions.append(local_solutions)
+
+#         current_solutions = [el[0] for el in new_solutions]  # pierwszy krok pętli przerzucony na koniec dla uproszczenia zapisu
+#         for sol in current_solutions:
+#             if sol.counter > 10 and sol in top_solutions:
+#                 current_solutions.remove(sol)
+#         current_solutions.sort(key=lambda el: el.profitability, reverse=True)
+#         counter += 1
+#     return top_solutions
+
+
+def update_best_solutions(best_solutions: list, new_solutions: list):
+    best_solutions.extend(new_solutions)
+    best_solutions = list(set(best_solutions))
+    best_solutions.sort(key=lambda x: x.profitability, reverse=True)
+    return best_solutions[:BEST_SOLUTIONS_NUM] #top 5
+
+
+def bees_optimization_algorithm(graph, num_of_vertices, iterations=40, population_size=10, elite_places=3, good_places=2, elite_bees=50, good_bees=25) -> list[Solution]:
+    current_solutions = initial_solutions(graph, population_size, num_of_vertices) #<population_size> rozwiązań
+    best_solutions = current_solutions[:BEST_SOLUTIONS_NUM] #najlepsze dotychczasowe rozwiązania (top 5)
     counter = 0
 
-    top_solutions = []
-
     while counter < iterations:
-        chosen_solutions = current_solutions[:elite_places + good_places]  # rozwiązania elitarne + dobre
-        new_solutions = []
+        top_solutions = current_solutions[:elite_places+good_places] #wyróżnienie najlepszych rozwiązań do generowania nowych na ich podstawie
+        current_solutions.clear()
 
-        for i, chosen_solution in enumerate(chosen_solutions):
-            local_solutions = []
-            chosen_solution.counter += 1
-            for _ in range(elite_bees if i < elite_places else good_bees):
-                new_solution = generate_solution(chosen_solution.solution, graph)
-                solution = Solution(new_solution, graph)
-                local_solutions.append(solution)
-                update_top(top_solutions, solution)
-            local_solutions.sort(key=lambda el: el.profitability, reverse=True)
-            new_solutions.append(local_solutions)
+        for i, top_solution in enumerate(top_solutions):
+            top_solution.counter += 1
+            local_solutions = [top_solution] if top_solution.counter < 10 else [] #jeśli rozwiązanie nie jest zbyt długo rozważane
 
-        current_solutions = [el[0] for el in
-                             new_solutions]  # pierwszy krok pętli przerzucony na koniec dla uproszczenia zapisu
-        for sol in current_solutions:
-            if sol.counter > 10 and sol in top_solutions:
-                current_solutions.remove(sol)
-        current_solutions.sort(key=lambda el: el.profitability, reverse=True)
+            for _ in range(elite_bees if i < elite_places else good_bees): #generowanie nowych rozwiązań dla miejsc elitarnych i dobrych
+                new_solution = Solution(generate_solution(top_solution.solution, graph, 1), graph)
+                local_solutions.append(new_solution)
+
+            current_solutions.append(max(local_solutions, key=lambda x: x.profitability)) #zapamiętywanie najlepszego lokalnego rozwiązania
+        
+        filler_solutions = initial_solutions(graph, population_size - elite_places - good_places, num_of_vertices)
+        current_solutions.extend(filler_solutions) #uzupełnianie rozwiązań nowymi, losowo wygenerowanymi
+        current_solutions.sort(key=lambda x: x.profitability, reverse=True)
+
+        best_solutions = update_best_solutions(best_solutions, current_solutions)
         counter += 1
-    return top_solutions
+    
+    return best_solutions
+        
 
 
 if __name__ == "__main__":
-    G, number_of_vertices = get_graph_edges("../graphs/city_kos.txt")
-    solutions = first_bees(G, number_of_vertices)
+    G, number_of_vertices = get_graph_edges("graphs/city_kos.txt")
+    solutions = bees_optimization_algorithm(G, number_of_vertices)
     for sol in solutions:
         print(f'{sol.solution}   {sol.profitability}')
