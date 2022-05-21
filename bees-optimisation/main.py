@@ -271,13 +271,18 @@ def bees_optimization_algorithm(graph, num_of_vertices, iterations=40, populatio
 
         best_solutions = update_best_solutions(best_solutions, current_solutions)
         counter += 1
+        print(f"{round(counter*100/iterations,2)}% - {best_solutions[0].profitability} profit, {best_solutions[0].cost}$ cost")
     
     return best_solutions
         
 
 
 if __name__ == "__main__":
-    G, number_of_vertices = get_graph_edges("graphs/city_kos.txt")
-    solutions = bees_optimization_algorithm(G, number_of_vertices)
+    G, number_of_vertices = get_graph_edges("graphs/f30.txt")
+    # graph, num_of_vertices, iterations=40, population_size=10, elite_places=3, good_places=2, elite_bees=50, good_bees=25
+    # solutions = bees_optimization_algorithm(G, number_of_vertices, 10, 10, 3, 2, 10, 5)
+    ADD_THRESHOLD = 1
+    DELETE_THRESHOLD = 1
+    solutions = bees_optimization_algorithm(G, number_of_vertices, 100, 10, 3, 2, 20, 10)
     for sol in solutions:
         print(f'{sol.solution}   {sol.profitability}')
