@@ -1,5 +1,5 @@
 import sys
-from bee_algorithm import first_bees, get_graph_edges
+from bee_algorithm import bees_optimization_algorithm, get_graph_edges
 from gen_algorithm import evolve
 from utils.graph import get_graph
 
@@ -20,10 +20,10 @@ if __name__ == '__main__':
         res = arg.lower().split('=')
         d[res[0]] = int(res[1])
 
-    # python main.py [bee] [it] [ep] [gp] [eb] [gb]
+    # python main.py [bee] [it] [ps] [ep] [gp] [eb] [gb]
     if ALGO_TYPE == ALGO_BEE:
         G, number_of_vertices = get_graph_edges("graphs/city_kos")
-        solutions = first_bees(G, number_of_vertices, **d)
+        solutions = bees_optimization_algorithm(G, number_of_vertices, **d)
         for solution in solutions:
             print(f'{solution.solution}   {solution.profitability}')
 

@@ -6,7 +6,7 @@ from .const_values import *
 def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
     population = []
     # case 1
-    if max_buildings is None and max_cost is None:
+    if (max_buildings is None and max_cost is None) or (max_buildings == -1 and max_cost == -1):
         for _ in range(size):
             vector = list(np.random.choice([HOUSE, FUN, WORK], size=length))
             vector[0] = CENTRE
@@ -26,7 +26,7 @@ def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
                     vertices_possible.add(u)
             vertices_done.add(0)
             # case 2
-            if max_cost is None:
+            if max_cost is None or max_cost == -1:
                 for _ in range(max_buildings):
                     vertex = random.choice(list(vertices_possible - vertices_done))
                     vector[vertex] = random.choice([HOUSE, FUN, WORK])
@@ -36,7 +36,7 @@ def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
                             vertices_possible.add(u)
                     vertices_done.add(vertex)
             # case 3
-            elif max_buildings is None:
+            elif max_buildings is None or max_buildings == -1:
                 cost = 0
                 while True:
                     vertex = random.choice(list(vertices_possible - vertices_done))
