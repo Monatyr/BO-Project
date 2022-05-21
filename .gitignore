@@ -1,2 +1,4 @@
-/uwagi.txt
-/bees-optimisation/__pycache__
+.idea/
+/bee_algorithm/__pycache__/
+/gen_algorithm/__pycache__/
+/utils/__pycache__/

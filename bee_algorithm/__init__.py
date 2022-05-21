@@ -1,14 +1,14 @@
-from bees_utils import *
-from sortedcontainers import SortedSet
+from .utils import *
+
 
 max_buildings = -1
 max_cost = -1
-
 
 ADD_THRESHOLD = 0.33
 DELETE_THRESHOLD = 0.66
 
 TOP_SOLUTIONS_NUM = 10
+
 
 class Solution:
     def __init__(self, solution, city):
@@ -25,7 +25,10 @@ class Solution:
 
 
 def initial_solutions(graph, num_of_solutions: int, solution_length: int, max_buildings_param=-1, max_cost_param=-1):
-    '''generuje początkowe populacje i zwraca je posortowane malejąco według ich opłacalności'''
+    """
+    generuje początkowe populacje i zwraca je posortowane malejąco według ich opłacalności
+    """
+
     global max_buildings, max_cost
     max_buildings, max_cost = max_buildings_param, max_cost_param
     result = list()
@@ -34,6 +37,7 @@ def initial_solutions(graph, num_of_solutions: int, solution_length: int, max_bu
         result.append(Solution(solution, graph))
     result.sort(key=lambda el: el.profitability, reverse=True)
     return result
+
 
 def check_building_num(solution):
     global max_buildings
@@ -59,9 +63,10 @@ def check_cost(solution):
             return False
     return True
 
+
 def check_constraints(solution, index):
     new_solution = solution.copy()
-    for i in [1,2,3]:
+    for i in [1, 2, 3]:
         new_solution[index] = i
         if check_cost(new_solution) and check_building_num(new_solution):
             return True
@@ -83,6 +88,7 @@ def count_empty_unchanged(solution, edited_nodes):
             counter += 1
     return counter
 
+
 def get_empty_unchanged_index(solution, edited_nodes):
     nodes = []
     for i in range(1, len(solution)):
@@ -90,8 +96,12 @@ def get_empty_unchanged_index(solution, edited_nodes):
             nodes.append(i)
     return nodes
 
+
 def generate_solution(old_solution, G, num_of_changes=5):
-    '''generuje nowe rozwiązanie na podstawie dostarczonego'''
+    """
+    generuje nowe rozwiązanie na podstawie dostarczonego
+    """
+
     global max_buildings, max_cost
     new_solution = old_solution.copy()
     edited_nodes = [False for _ in range(len(old_solution))]
@@ -100,8 +110,8 @@ def generate_solution(old_solution, G, num_of_changes=5):
     while changes_counter < num_of_changes:
         prob = random.random()
         loop_counter = 0
-        if 0 <= prob < ADD_THRESHOLD:     #zmiana istniejącego budynku
-            #print("CHUNG")
+        if 0 <= prob < ADD_THRESHOLD:  # zmiana istniejącego budynku
+            # print("CHUNG")
             while True:
                 loop_counter += 1
                 if loop_counter > len(old_solution):
@@ -112,15 +122,15 @@ def generate_solution(old_solution, G, num_of_changes=5):
                         new_building = random.randint(1, 3)
                         temp_solution = new_solution.copy()
                         temp_solution[index] = new_building
-                        if check_cost(temp_solution):       #liczba budynków się nie zmienia, więc sprawdzamy sam koszt
+                        if check_cost(temp_solution):  # liczba budynków się nie zmienia, więc sprawdzamy sam koszt
                             if new_building != new_solution[index]:
                                 changes_counter += 1
                                 edited_nodes[index] = True
                             new_solution[index] = new_building
                             break
                     break
-        elif ADD_THRESHOLD <= prob < DELETE_THRESHOLD and empty_counter > 0:   #dodanie nowego budynku
-            #print("ADDUM")
+        elif ADD_THRESHOLD <= prob < DELETE_THRESHOLD and empty_counter > 0:  # dodanie nowego budynku
+            # print("ADDUM")
             available_nodes = get_empty_unchanged_index(new_solution, edited_nodes)
             while True:
                 loop_counter += 1
@@ -134,17 +144,17 @@ def generate_solution(old_solution, G, num_of_changes=5):
                     break
 
                 connected = False
-                for e in G:  #sprawdź czy wylosowany wierzchołek jest połączony z innym budynkiem
+                for e in G:  # sprawdź czy wylosowany wierzchołek jest połączony z innym budynkiem
                     if index in e:
-                        adjacent = e[int(not e.index(index))]   #znajdź drugi wierzchołek na krawędzi
+                        adjacent = e[int(not e.index(index))]  # znajdź drugi wierzchołek na krawędzi
                         if new_solution[adjacent] != -1:
                             connected = True
                             break
                 if not connected:
                     continue
 
-                #print(f'node was edited = {edited_nodes[index]}\nprevious value = {new_solution[index]}\n\n')
-                #print(f'empty_counter = {empty_counter}\nreal count = {count_empty_unchanged(new_solution, edited_nodes)}\n\n')
+                # print(f'node was edited = {edited_nodes[index]}\nprevious value = {new_solution[index]}\n\n')
+                # print(f'empty_counter = {empty_counter}\nreal count = {count_empty_unchanged(new_solution, edited_nodes)}\n\n')
                 if not edited_nodes[index] and new_solution[index] == -1:
                     while True:
                         new_building = random.randint(1, 3)
@@ -157,8 +167,8 @@ def generate_solution(old_solution, G, num_of_changes=5):
                             empty_counter -= 1
                             break
                     break
-        elif DELETE_THRESHOLD <= prob <= 1:                     #usunięcie budynku
-            #print("DELET")
+        elif DELETE_THRESHOLD <= prob <= 1:  # usunięcie budynku
+            # print("DELET")
             while True:
                 loop_counter += 1
                 if loop_counter > len(old_solution):
@@ -168,7 +178,7 @@ def generate_solution(old_solution, G, num_of_changes=5):
                 connected = True
                 temp_solution = new_solution.copy()
                 temp_solution[index] = -1
-                for e in G:  #sprawdź czy po usunięciu wierzchołka jeden z jego sąsiadów-budynków nie zostanie odłączony od reszty
+                for e in G:  # sprawdź czy po usunięciu wierzchołka jeden z jego sąsiadów-budynków nie zostanie odłączony od reszty
                     if index in e:
                         adjacent = e[int(not e.index(index))]  # znajdź drugi wierzchołek na krawędzi
                         if temp_solution[adjacent] == -1:
@@ -176,7 +186,7 @@ def generate_solution(old_solution, G, num_of_changes=5):
                         connected_adj = False
                         for e2 in G:
                             if adjacent in e2 and index not in e2:
-                                adj_of_adjacent = e2[int(not e2.index(adjacent))]   # znajdź otoczenie sąsiada index-u
+                                adj_of_adjacent = e2[int(not e2.index(adjacent))]  # znajdź otoczenie sąsiada index-u
                                 if temp_solution[adj_of_adjacent] != -1:
                                     connected_adj = True
                                     break
@@ -191,7 +201,7 @@ def generate_solution(old_solution, G, num_of_changes=5):
                     edited_nodes[index] = True
                     changes_counter += 1
                     break
-    #print(new_solution)
+    # print(new_solution)
     return new_solution
 
 
@@ -202,22 +212,24 @@ def update_top(top, solution):
         top.pop(-1)
 
 
-def first_bees(graph, num_of_vertices, iterations=40, elite_places=3, good_places=2, elite_bees=50,
-               good_bees=25) -> Solution:
-    current_solutions = initial_solutions(graph, elite_places + good_places,
-                                          num_of_vertices)  # lista Solutions - czyli rozwiązanie i obliczona dla niego funkcja celu, posortowane malejąco
+def first_bees(graph, num_of_vertices, it=40, ep=3, gp=2, eb=50, gb=25) -> list[Solution]:
+    current_solutions = initial_solutions(
+        graph,
+        ep + gp,
+        num_of_vertices
+    )  # lista Solutions - czyli rozwiązanie i obliczona dla niego funkcja celu, posortowane malejąco
     counter = 0
 
     top_solutions = []
 
-    while counter < iterations:
-        chosen_solutions = current_solutions[:elite_places + good_places]  # rozwiązania elitarne + dobre
+    while counter < it:
+        chosen_solutions = current_solutions[:ep + gp]  # rozwiązania elitarne + dobre
         new_solutions = []
 
         for i, chosen_solution in enumerate(chosen_solutions):
             local_solutions = []
             chosen_solution.counter += 1
-            for _ in range(elite_bees if i < elite_places else good_bees):
+            for _ in range(eb if i < ep else gb):
                 new_solution = generate_solution(chosen_solution.solution, graph)
                 solution = Solution(new_solution, graph)
                 local_solutions.append(solution)
@@ -233,10 +245,3 @@ def first_bees(graph, num_of_vertices, iterations=40, elite_places=3, good_place
         current_solutions.sort(key=lambda el: el.profitability, reverse=True)
         counter += 1
     return top_solutions
-
-
-if __name__ == "__main__":
-    G, number_of_vertices = get_graph_edges("../graphs/city_kos.txt")
-    solutions = first_bees(G, number_of_vertices)
-    for sol in solutions:
-        print(f'{sol.solution}   {sol.profitability}')

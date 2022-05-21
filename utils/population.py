@@ -1,6 +1,6 @@
-import numpy as np
 import random
-from consts import *
+import numpy as np
+from .const_values import *
 
 
 def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
@@ -11,7 +11,7 @@ def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
             vector = list(np.random.choice([HOUSE, FUN, WORK], size=length))
             vector[0] = CENTRE
             population.append(vector)
-    # case 2,3,4
+    # case 2, 3, 4
     else:
         if graph is None:
             raise Exception("No graph!")

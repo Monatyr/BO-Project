@@ -1,9 +1,8 @@
 import copy
 import random
 
-from function import *
-from population import *
-from load import *
+from utils.population import get_population
+from utils.adaptation import *
 
 
 def cross(population, children=100, graph=None, max_buildings=None, max_cost=None):
@@ -76,29 +75,12 @@ def select(population, graph, size=100):
         population.pop()
 
 
-def evolve(graph, length, epoch=100, size=100, children=100, max_buildings=None, max_cost=None):
-    population = get_population(length, size, graph=graph, max_buildings=max_buildings, max_cost=max_cost)
+def evolve(graph, length, epoch=100, size=100, children=100, maxb=None, maxc=None):
+    population = get_population(length, size, graph=graph, max_buildings=maxb, max_cost=maxc)
     print("{:.2f}%".format(0), data(population[0], graph), "==", f(*data(population[0], graph)), "with", str(cost(population[0]))+"$", buildings(population[0]))
     for percent in range(epoch):
-        cross(population, children=children, graph=graph, max_buildings=max_buildings, max_cost=max_cost)
-        mutate(population, max_cost=max_cost)
+        cross(population, children=children, graph=graph, max_buildings=maxb, max_cost=maxc)
+        mutate(population, max_cost=maxc)
         select(population, graph, size=size)
         print("{:.2f}%".format(100*(percent+1)/epoch), data(population[0], graph), "==", f(*data(population[0], graph)), str(cost(population[0]))+"$", buildings(population[0]))
     return population[0], f(*data(population[0], graph))
-
-
-print(evolve(*get_graph("../../graph/f30"), 10, 10, 10))
-#print(evolve(city_kos, 12))
-
-
-"""
-    for vector in vectors:
-        population.append((vector, f(*data(vector, graph))))
-    for _ in range(epoch):
-        new_population = copy.deepcopy(population)
-        for _ in range(children):
-            pop = random.choice(population)[0]
-            new_population.append((mutate(pop), f(*data(pop, graph))))
-        new_population.sort(key=lambda x: x[1], reverse=True)
-        population = new_population[:size]
-"""

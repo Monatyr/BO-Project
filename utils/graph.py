@@ -5,8 +5,8 @@ def get_graph(file):
     f = open(file, "r")
     lines = f.readlines()
     graph = []
-    for l in lines:
-        s = l.split()
+    for line in lines:
+        s = line.split()
         if s[0] == "p":
             length = int(s[2])
         if s[0] == "e":
@@ -26,4 +26,4 @@ def get_graph(file):
     if len(vertices_possible) != length:
         raise Exception("The graph is not connected")
 
-    return (graph, length)
+    return graph, length
