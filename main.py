@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # python main.py [gen] [fn] [epoch] [size] [children] [chance] [maxb] [maxc]
     elif ALGO_TYPE == ALGO_GEN:
-        evolve(*get_graph(FILE_NAME), **d)
+        print(evolve(*get_graph(FILE_NAME), **d))
     else:
         print(f'Wrong argument! Use: python main.py [{ALGO_BEE}|{ALGO_GEN}]')
         exit(1)

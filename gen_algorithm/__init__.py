@@ -80,7 +80,7 @@ def select(population, graph, size=100):
         population.pop()
 
 
-def evolve(graph, length, epoch=100, size=100, children=100, chance=0.1, maxb=None, maxc=None):
+def evolve(graph, length, epoch=40, size=10, children=200, chance=0.1, maxb=None, maxc=None):
     population = get_population(length, size, graph=graph, max_buildings=maxb, max_cost=maxc)
     dimacs = get_dimacs(graph)
     #dimacs = None
