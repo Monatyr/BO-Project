@@ -211,8 +211,8 @@ def update_best_solutions(best_solutions: list, new_solutions: list):
     return best_solutions[:BEST_SOLUTIONS_NUM]  # top 5
 
 
-def bees_optimization_algorithm(graph, num_of_vertices, it=40, ps=10, ep=3, gp=2, eb=50, gb=25, max_b=-1, max_c=-1, a_thr=1, d_thr=1) -> list[Solution]:
-    current_solutions = initial_solutions(graph, ps, num_of_vertices, max_b, max_c) #<ps> rozwiązań
+def bees_optimization_algorithm(graph, num_of_vertices, it=40, ps=10, ep=3, gp=2, eb=50, gb=25, maxb=-1, maxc=-1, athr=1, dthr=1) -> list[Solution]:
+    current_solutions = initial_solutions(graph, ps, num_of_vertices, maxb, maxc) #<ps> rozwiązań
     best_solutions = current_solutions[:BEST_SOLUTIONS_NUM] #najlepsze dotychczasowe rozwiązania (top 5)
     counter = 0
 
@@ -226,12 +226,12 @@ def bees_optimization_algorithm(graph, num_of_vertices, it=40, ps=10, ep=3, gp=2
 
             for _ in range(eb if i < ep else gb): #generowanie nowych rozwiązań dla miejsc elitarnych i dobrych
                 num_of_changes = random.randint(1, int(0.2 * top_solution.num_of_buildings) + 1)
-                new_solution = Solution(generate_solution(top_solution.solution, graph, max_b, max_c, num_of_changes, a_thr, d_thr), graph)
+                new_solution = Solution(generate_solution(top_solution.solution, graph, maxb, maxc, num_of_changes, athr, dthr), graph)
                 local_solutions.append(new_solution)
 
             current_solutions.append(max(local_solutions, key=lambda x: x.profitability)) #zapamiętywanie najlepszego lokalnego rozwiązania
         
-        filler_solutions = initial_solutions(graph, ps - ep - gp, num_of_vertices, max_b, max_c)
+        filler_solutions = initial_solutions(graph, ps - ep - gp, num_of_vertices, maxb, maxc)
         current_solutions.extend(filler_solutions) #uzupełnianie rozwiązań nowymi, losowo wygenerowanymi
         current_solutions.sort(key=lambda x: x.profitability, reverse=True)
 
