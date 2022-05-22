@@ -1,7 +1,6 @@
 import random
 from queue import Queue
 from utils.const_values import *
-from utils.population import get_population
 
 
 def data(solution, city):
@@ -118,13 +117,3 @@ def check_connectivity(graph):
                 n.visited = True
 
     return visited == len(graph)
-
-
-if __name__ == "__main__":
-    G = get_graph('graphs/graph')
-    print(check_connectivity(G))
-    # pop_graph = get_graph_edges('graphs/graph')[0]
-    # get_population(5, 1, max_buildings=5, graph=pop_graph, max_cost=100000000)
-
-    G, number_of_vertices = get_graph_edges('graphs/graph')
-    print(get_population(number_of_vertices, 5, max_buildings=number_of_vertices, max_cost=60000, graph=G))
