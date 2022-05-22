@@ -95,7 +95,7 @@ def f(money, happiness, buildings, cost):
     return real_money
 
 
-def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
+def get_population(length, size, max_buildings, max_cost, graph=None):
     population = []
     # case 1 - no limits
     if max_buildings == -1 and max_cost == -1:
@@ -131,7 +131,10 @@ def get_population(length, size, max_buildings=-1, graph=None, max_cost=-1):
             elif max_buildings == -1:
                 cost = 0
                 while True:
-                    vertex = random.choice(list(vertices_possible - vertices_done))
+                    vertices_left = list(vertices_possible - vertices_done)
+                    if len(vertices_left) == 0:
+                        break
+                    vertex = random.choice(vertices_left)
                     choice = random.choice([HOUSE, FUN, WORK])
                     if cost + COSTS[choice] > max_cost:
                         break
