@@ -3,9 +3,10 @@ import random
 
 from utils.population import get_population
 from utils.adaptation import *
+from utils.get_dimacs import get_dimacs
 
 
-def cross(population, children=100, graph=None, max_buildings=None, max_cost=None):
+def cross(population, children=100, graph=None, max_buildings=None, max_cost=None, dimacs=None):
     for _ in range(children):
         parent1 = random.choice(population)
         parent2 = random.choice(population)
@@ -34,10 +35,14 @@ def cross(population, children=100, graph=None, max_buildings=None, max_cost=Non
             c += COSTS[building]
             n += 1
             child[vertex] = building
-            for (u, v) in graph:
-                if vertex in (u, v):
+            if dimacs is None:
+                for (u, v) in graph:
+                    if vertex in (u, v):
+                        vertices_possible.add(v)
+                        vertices_possible.add(u)
+            else:
+                for v in dimacs[vertex]:
                     vertices_possible.add(v)
-                    vertices_possible.add(u)
             vertices_done.add(vertex)
             if max_buildings is not None and n == max_buildings:
                 break
@@ -77,9 +82,11 @@ def select(population, graph, size=100):
 
 def evolve(graph, length, epoch=100, size=100, children=100, chance=0.1, maxb=None, maxc=None):
     population = get_population(length, size, graph=graph, max_buildings=maxb, max_cost=maxc)
+    dimacs = get_dimacs(graph)
+    #dimacs = None
     print("{:.2f}%".format(0), data(population[0], graph), "==", f(*data(population[0], graph)), "with", str(cost(population[0]))+"$", buildings(population[0]))
     for percent in range(epoch):
-        cross(population, children=children, graph=graph, max_buildings=maxb, max_cost=maxc)
+        cross(population, children=children, graph=graph, max_buildings=maxb, max_cost=maxc, dimacs=dimacs)
         mutate(population, chance=chance, max_cost=maxc)
         select(population, graph, size=size)
         print("{:.2f}%".format(100*(percent+1)/epoch), data(population[0], graph), "==", f(*data(population[0], graph)), str(cost(population[0]))+"$", buildings(population[0]))

@@ -13,7 +13,7 @@ if __name__ == '__main__':
         exit(1)
 
     ALGO_TYPE = sys.argv[1].lower()
-    FILE_NAME = "city_kos"
+    FILE_NAME = "f30"
     args = sys.argv[2:]
 
     d = dict()
