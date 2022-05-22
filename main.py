@@ -13,23 +13,32 @@ if __name__ == '__main__':
         exit(1)
 
     ALGO_TYPE = sys.argv[1].lower()
+    FILE_NAME = "city_kos"
     args = sys.argv[2:]
 
     d = dict()
     for arg in args:
         res = arg.lower().split('=')
-        d[res[0]] = int(res[1])
+        if res[0] != 'fn':
+            res[1] = int(res[1])
+        d[res[0]] = res[1]
 
-    # python main.py [bee] [it] [ps] [ep] [gp] [eb] [gb]
+    if 'fn' in d:
+        FILE_NAME = d['fn']
+        del d['fn']
+
+    FILE_NAME = f'graphs/{FILE_NAME}'
+
+    # python main.py [bee] [fn] [it] [ps] [ep] [gp] [eb] [gb]
     if ALGO_TYPE == ALGO_BEE:
-        G, number_of_vertices = get_graph_edges("graphs/city_kos")
+        G, number_of_vertices = get_graph_edges(FILE_NAME)
         solutions = bees_optimization_algorithm(G, number_of_vertices, **d)
         for solution in solutions:
             print(f'{solution.solution}   {solution.profitability}')
 
-    # python main.py [gen] [epoch] [size] [children] [maxb] [maxc]
+    # python main.py [gen] [fn] [epoch] [size] [children] [maxb] [maxc]
     elif ALGO_TYPE == ALGO_GEN:
-        evolve(*get_graph("graphs/f30"), **d)
+        evolve(*get_graph(FILE_NAME), **d)
     else:
         print(f'Wrong argument! Use: python main.py [{ALGO_BEE}|{ALGO_GEN}]')
         exit(1)
