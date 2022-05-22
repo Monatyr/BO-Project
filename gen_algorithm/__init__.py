@@ -75,12 +75,12 @@ def select(population, graph, size=100):
         population.pop()
 
 
-def evolve(graph, length, epoch=100, size=100, children=100, maxb=None, maxc=None):
+def evolve(graph, length, epoch=100, size=100, children=100, chance=0.1, maxb=None, maxc=None):
     population = get_population(length, size, graph=graph, max_buildings=maxb, max_cost=maxc)
     print("{:.2f}%".format(0), data(population[0], graph), "==", f(*data(population[0], graph)), "with", str(cost(population[0]))+"$", buildings(population[0]))
     for percent in range(epoch):
         cross(population, children=children, graph=graph, max_buildings=maxb, max_cost=maxc)
-        mutate(population, max_cost=maxc)
+        mutate(population, chance=chance, max_cost=maxc)
         select(population, graph, size=size)
         print("{:.2f}%".format(100*(percent+1)/epoch), data(population[0], graph), "==", f(*data(population[0], graph)), str(cost(population[0]))+"$", buildings(population[0]))
     return population[0], f(*data(population[0], graph))

@@ -19,9 +19,15 @@ if __name__ == '__main__':
     d = dict()
     for arg in args:
         res = arg.lower().split('=')
-        if res[0] != 'fn':
-            res[1] = int(res[1])
-        d[res[0]] = res[1]
+        if res[0] == 'fn':
+            d[res[0]] = res[1]
+        elif res[0] == 'chance':
+            d[res[0]] = float(res[1])
+            if not 0.0 <= d[res[0]] <= 1.0:
+                print("Invalid argument 'chance': its value should be between 0 and 1!")
+                exit(1)
+        else:
+            d[res[0]] = int(res[1])
 
     if 'fn' in d:
         FILE_NAME = d['fn']
@@ -29,14 +35,14 @@ if __name__ == '__main__':
 
     FILE_NAME = f'graphs/{FILE_NAME}'
 
-    # python main.py [bee] [fn] [it] [ps] [ep] [gp] [eb] [gb] [max_b] [max_c] [a_thr] [d_thr]
+    # python main.py [bee] [fn] [it] [ps] [ep] [gp] [eb] [gb] [maxb] [maxc] [athr] [dthr]
     if ALGO_TYPE == ALGO_BEE:
         G, number_of_vertices = get_graph_edges(FILE_NAME)
         solutions = bees_optimization_algorithm(G, number_of_vertices, **d)
         for solution in solutions:
             print(f'{solution.solution}   {solution.profitability}')
 
-    # python main.py [gen] [fn] [epoch] [size] [children] [maxb] [maxc]
+    # python main.py [gen] [fn] [epoch] [size] [children] [chance] [maxb] [maxc]
     elif ALGO_TYPE == ALGO_GEN:
         evolve(*get_graph(FILE_NAME), **d)
     else:
