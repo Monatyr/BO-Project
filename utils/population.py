@@ -39,7 +39,10 @@ def get_population(length, size, graph=None, max_buildings=None, max_cost=None):
             elif max_buildings is None or max_buildings == -1:
                 cost = 0
                 while True:
-                    vertex = random.choice(list(vertices_possible - vertices_done))
+                    vertices_left = list(vertices_possible - vertices_done)
+                    if len(vertices_left) == 0:
+                        break
+                    vertex = random.choice(vertices_left)
                     choice = random.choice([HOUSE, FUN, WORK])
                     if cost + COSTS[choice] > max_cost:
                         break

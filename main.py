@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     FILE_NAME = f'graphs/{FILE_NAME}'
 
-    # python main.py [bee] [fn] [it] [ps] [ep] [gp] [eb] [gb]
+    # python main.py [bee] [fn] [it] [ps] [ep] [gp] [eb] [gb] [max_b] [max_c] [a_thr] [d_thr]
     if ALGO_TYPE == ALGO_BEE:
         G, number_of_vertices = get_graph_edges(FILE_NAME)
         solutions = bees_optimization_algorithm(G, number_of_vertices, **d)
