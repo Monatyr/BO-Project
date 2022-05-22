@@ -23,6 +23,9 @@ if __name__ == '__main__':
             d[res[0]] = res[1]
         elif res[0] == 'chance':
             d[res[0]] = float(res[1])
+            if not 0.0 <= d[res[0]] <= 1.0:
+                print("Invalid argument 'chance': its value should be between 0 and 1!")
+                exit(1)
         else:
             d[res[0]] = int(res[1])
 
