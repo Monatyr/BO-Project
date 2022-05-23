@@ -15,7 +15,7 @@ class Solution:
         self.solution = solution
         m, h, b, c = data(solution, city)
         self.profitability = m
-        self.happines = h
+        self.happiness = h
         self.num_of_buildings = b
         self.cost = c
         self.counter = 0
@@ -29,7 +29,7 @@ class Solution:
         return False
 
     def __hash__(self):
-        return hash(self.cost + sum(self.solution) + self.happines)
+        return hash(self.cost + sum(self.solution) + self.happiness)
 
 
 def initial_solutions(graph, num_of_solutions: int, solution_length: int, max_buildings, max_cost):
@@ -124,7 +124,9 @@ def generate_solution(old_solution, G, max_buildings, max_cost, num_of_changes, 
                     break
                 index = random.randint(1, len(old_solution) - 1)
                 if not edited_nodes[index] and new_solution[index] != -1:
+                    loop_check = 0
                     while True:
+                        loop_check += 1
                         new_building = random.randint(1, 3)
                         temp_solution = new_solution.copy()
                         temp_solution[index] = new_building
@@ -134,6 +136,8 @@ def generate_solution(old_solution, G, max_buildings, max_cost, num_of_changes, 
                                 changes_counter += 1
                                 edited_nodes[index] = True
                             new_solution[index] = new_building
+                            break
+                        elif loop_check > 2:
                             break
                     break
         elif add_thr <= prob < delete_thr and empty_counter > 0:  # dodanie nowego budynku
